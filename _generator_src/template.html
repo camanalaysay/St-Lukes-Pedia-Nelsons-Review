@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pediatrics Exam Generator</title>
+<link rel="icon" href="__LOGO__">
+<style>
+:root{
+  --blue:#22408f; --blue-2:#2f55b8; --blue-soft:#eaf0fb; --red:#d4262e; --red-soft:#fdecec;
+  --ink:#16203a; --ink-2:#4a5672; --ink-3:#7c869d; --line:#dde3ee; --bg:#f4f6fa; --card:#ffffff;
+  --ok:#1d7a46; --ok-soft:#e5f4ec; --warn:#9a5b00; --warn-soft:#fff4e0;
+  --e:#3f9d6b; --a:#e0a32a; --d:#c8473f;
+  --radius:12px; --shadow:0 1px 2px rgba(22,32,58,.06),0 4px 16px rgba(22,32,58,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header.top{background:var(--card);border-bottom:3px solid var(--red)}
+header.top .wrap{display:flex;align-items:center;gap:22px;padding-top:14px;padding-bottom:14px}
+header.top img{height:58px;width:auto}
+header.top .sep{width:1px;align-self:stretch;background:var(--line)}
+header.top h1{margin:0;font-size:22px;letter-spacing:-.01em;color:var(--blue)}
+header.top p{margin:2px 0 0;color:var(--ink-2);font-size:13.5px}
+.dept{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+
+main{padding:24px 0 40px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:1fr}.side{position:static!important}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px}
+.card > .hd{display:flex;align-items:center;gap:12px;padding:16px 20px 0}
+.step{flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:13.5px;display:grid;place-items:center}
+.card h2{margin:0;font-size:16.5px}
+.card .hd .sub{color:var(--ink-3);font-size:13px;margin-left:auto;text-align:right}
+.card .bd{padding:14px 20px 20px}
+
+label.f{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue-2);box-shadow:0 0 0 3px rgba(47,85,184,.15)}
+textarea{resize:vertical;min-height:70px;font-size:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:600;font-size:13.5px;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--blue-soft);border-color:#c8d4ef}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-2)}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.red:hover{background:#b81f26}
+.btn.big{padding:12px 16px;font-size:15px;width:100%;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.icon-btn{border:1px solid var(--line);background:#fff;border-radius:8px;width:38px;height:38px;cursor:pointer;flex:none}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:#c8d4ef}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--blue);color:#fff}
+
+/* Section table */
+.sec-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.sec-tools .grow{flex:1}
+.sec-table{border:1px solid var(--line);border-radius:10px;overflow:hidden;max-height:540px;overflow-y:auto}
+table.secs{width:100%;border-collapse:collapse;font-size:13.5px}
+table.secs th{position:sticky;top:0;background:#f7f9fc;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);padding:8px 10px;border-bottom:1px solid var(--line);z-index:1}
+table.secs td{padding:6px 10px;border-bottom:1px solid #eef1f6}
+table.secs tr:last-child td{border-bottom:0}
+table.secs tr.off td{color:var(--ink-3)}
+table.secs tr.off .cnt{opacity:.4}
+table.secs td.n,table.secs th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.secs td.no{color:var(--ink-3);width:34px;font-variant-numeric:tabular-nums}
+table.secs input[type=number]{width:72px;padding:4px 6px;text-align:right}
+table.secs input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue)}
+.cnt{font-weight:700;color:var(--blue)}
+.mini{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}
+.mini i{display:block;width:5px;border-radius:1px}
+tfoot td{background:#f7f9fc;font-weight:700;position:sticky;bottom:0;border-top:1px solid var(--line)}
+
+/* Difficulty */
+.mixbar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:#eef1f6;margin:12px 0 6px}
+.mixbar span{display:block;height:100%;transition:width .2s}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-2);flex-wrap:wrap}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.pct{display:flex;align-items:center;gap:6px}
+.pct input{width:76px;text-align:right}
+
+details.adv{border-top:1px dashed var(--line);margin-top:16px;padding-top:12px}
+details.adv summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--blue)}
+.checks{display:flex;gap:16px;flex-wrap:wrap}
+.checks label{display:flex;gap:7px;align-items:center;font-size:14px;cursor:pointer}
+.checks input{accent-color:var(--blue);width:16px;height:16px}
+
+/* Side summary */
+.side{position:sticky;top:16px}
+.stat{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid #eef1f6;font-size:14px}
+.stat:last-of-type{border-bottom:0}
+.stat b{font-size:16px;font-variant-numeric:tabular-nums}
+.big-n{font-size:40px;font-weight:800;color:var(--blue);line-height:1;letter-spacing:-.02em}
+.alert{border-radius:9px;padding:9px 12px;font-size:13px;margin-top:10px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.alert.err{background:var(--red-soft);color:#a3171d}
+.alert.ok{background:var(--ok-soft);color:var(--ok)}
+
+/* Preview */
+#preview{display:none}
+.pv-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line)}
+.pv-head h2{margin:0;font-size:18px}
+.pv-head .grow{flex:1}
+.blueprint{overflow-x:auto;padding:14px 20px;border-bottom:1px solid var(--line)}
+table.bp{border-collapse:collapse;font-size:13px;width:100%}
+table.bp th,table.bp td{padding:5px 9px;border-bottom:1px solid #eef1f6;text-align:right;font-variant-numeric:tabular-nums}
+table.bp th:first-child,table.bp td:first-child{text-align:left}
+table.bp thead th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
+table.bp tfoot td{font-weight:700;position:static}
+ol.qs{list-style:none;margin:0;padding:6px 20px 20px}
+ol.qs > li{padding:14px 0;border-bottom:1px solid #eef1f6;display:grid;grid-template-columns:38px 1fr;gap:4px 8px}
+ol.qs > li:last-child{border-bottom:0}
+.qn{font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+.qstem{font-weight:500}
+.qopts{margin:6px 0 0;padding:0;list-style:none}
+.qopts li{padding:3px 8px;border-radius:6px;margin:1px 0}
+.qopts li b{display:inline-block;width:22px;color:var(--ink-2)}
+.show-ans .qopts li.correct{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.show-ans .qopts li.correct b{color:var(--ok)}
+.qmeta{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:12px;color:var(--ink-3)}
+.tag{border:1px solid var(--line);border-radius:999px;padding:1px 8px;background:#fafbfd}
+.tag.E{color:var(--e);border-color:#cfe8da}.tag.A{color:#a87412;border-color:#f1dfb5}.tag.D{color:var(--d);border-color:#f0cfcc}
+.qmeta .btn{margin-left:auto}
+.rat{grid-column:2;display:none;margin-top:8px;background:#f7f9fc;border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 8px 8px 0;font-size:13.5px;color:var(--ink-2)}
+.show-ans .rat{display:block}
+.toggle{display:flex;gap:7px;align-items:center;font-size:13.5px;font-weight:600;cursor:pointer}
+.toggle input{accent-color:var(--blue);width:16px;height:16px}
+
+footer.site{border-top:1px solid var(--line);background:var(--card);padding:16px 0;color:var(--ink-3);font-size:13px}
+footer.site .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:10}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.busy{position:fixed;inset:0;background:rgba(244,246,250,.7);display:none;place-items:center;z-index:20;font-weight:700;color:var(--blue)}
+.busy.on{display:grid}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="__LOGO__" alt="St. Luke's Medical Center">
+    <div class="sep"></div>
+    <div>
+      <div class="dept">Department of Pediatrics</div>
+      <h1>Pediatrics Exam Generator</h1>
+      <p id="bankline">Nelson Textbook of Pediatrics, 21st ed. question bank</p>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+<div class="layout">
+<div>
+
+  <!-- 1. Exam details -->
+  <section class="card">
+    <div class="hd"><div class="step">1</div><h2>Exam details</h2></div>
+    <div class="bd">
+      <div class="grid2">
+        <div><label class="f" for="title">Exam title</label><input type="text" id="title" value="Pediatrics Written Examination"></div>
+        <div><label class="f" for="examDate">Exam date</label><input type="date" id="examDate"></div>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div>
+          <label class="f" for="code">Exam set code</label>
+          <div class="row" style="flex-wrap:nowrap"><input type="text" id="code"><button class="icon-btn" id="newCode" title="New random set code">⟳</button></div>
+        </div>
+        <div><label class="f" for="minutes">Time allowed (minutes)</label><input type="number" id="minutes" min="1" placeholder="Auto"></div>
+        <div><label class="f" for="paper">Paper size</label>
+          <select id="paper"><option value="letter">Letter (8.5 × 11 in)</option><option value="a4">A4</option><option value="legal">Legal (8.5 × 14 in)</option></select></div>
+      </div>
+      <div class="hint">The same set code with the same settings always produces the same exam.</div>
+      <div style="margin-top:14px">
+        <label class="f" for="instr">Instructions printed on the exam</label>
+        <textarea id="instr">Read each question carefully and choose the ONE best answer. Shade or write the letter of your answer on the answer sheet. Use of books, notes, and electronic devices is not allowed during the examination.</textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Number -->
+  <section class="card">
+    <div class="hd"><div class="step">2</div><h2>Number of questions</h2></div>
+    <div class="bd">
+      <div class="row">
+        <input type="number" id="nq" min="1" max="1000" value="100" style="width:120px;font-size:18px;font-weight:700">
+        <div class="chips" id="nqChips"></div>
+      </div>
+      <div class="hint" id="nqHint"></div>
+    </div>
+  </section>
+
+  <!-- 3. Coverage -->
+  <section class="card">
+    <div class="hd"><div class="step">3</div><h2>Coverage by section</h2><div class="sub" id="secSub"></div></div>
+    <div class="bd">
+      <div class="sec-tools">
+        <div class="seg" id="distMode">
+          <button data-v="even" class="on">Even split</button>
+          <button data-v="prop">Proportional to bank</button>
+          <button data-v="custom">Custom count per section</button>
+        </div>
+        <div class="grow"></div>
+        <button class="btn sm" id="selAll">Select all</button>
+        <button class="btn sm" id="selNone">Clear</button>
+      </div>
+      <div class="sec-table">
+        <table class="secs">
+          <thead><tr><th></th><th>#</th><th>Section</th><th class="n">Available</th><th class="n">Items</th></tr></thead>
+          <tbody id="secBody"></tbody>
+          <tfoot><tr><td></td><td></td><td id="secFootLabel">Total</td><td class="n" id="secFootAvail"></td><td class="n" id="secFootN"></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="hint" id="distHint"></div>
+    </div>
+  </section>
+
+  <!-- 4. Difficulty -->
+  <section class="card">
+    <div class="hd"><div class="step">4</div><h2>Difficulty level</h2></div>
+    <div class="bd">
+      <div class="seg" id="diffPreset">
+        <button data-v="30,40,30" class="on">Balanced</button>
+        <button data-v="20,30,50">Same as bank</button>
+        <button data-v="100,0,0">Easy only</button>
+        <button data-v="0,100,0">Average only</button>
+        <button data-v="0,0,100">Difficult only</button>
+        <button data-v="custom">Custom</button>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div class="pct"><label class="f" style="margin:0;width:64px">Easy</label><input type="number" id="pE" min="0" max="100" value="30"><span>%</span></div>
+        <div class="pct"><label class="f" style="margin:0;width:64px">Average</label><input type="number" id="pA" min="0" max="100" value="40"><span>%</span></div>
+        <div class="pct"><label class="f" style="margin:0;width:64px">Difficult</label><input type="number" id="pD" min="0" max="100" value="30"><span>%</span></div>
+      </div>
+      <div class="mixbar"><span id="barE" style="background:var(--e)"></span><span id="barA" style="background:var(--a)"></span><span id="barD" style="background:var(--d)"></span></div>
+      <div class="legend" id="mixLegend"></div>
+
+      <details class="adv">
+        <summary>Advanced options</summary>
+        <div style="margin-top:14px">
+          <label class="f">Cognitive level</label>
+          <div class="checks" id="cogChecks">
+            <label><input type="checkbox" value="0" checked> Recall</label>
+            <label><input type="checkbox" value="1" checked> Application</label>
+            <label><input type="checkbox" value="2" checked> Clinical reasoning</label>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <label class="f">Format and order</label>
+          <div class="checks">
+            <label><input type="checkbox" id="incK" checked> Include Type K (complex best-answer) items</label>
+            <label><input type="checkbox" id="shufOpts"> Shuffle answer choices</label>
+            <label><input type="checkbox" id="ansSheet" checked> Add answer sheet to exam PDF</label>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:14px">
+          <div><label class="f" for="order">Question order</label>
+            <select id="order"><option value="sec">Grouped by section</option><option value="rand">Fully randomized</option></select></div>
+          <div><label class="f" for="status">Review status</label>
+            <select id="status"><option value="active">All active items (exclude Retired)</option><option value="noRev">Exclude “Needs revision”</option><option value="approved">Approved items only</option></select></div>
+        </div>
+        <div style="margin-top:14px">
+          <label class="f" for="exclude">Exclude question IDs (e.g., items used in a previous exam)</label>
+          <textarea id="exclude" placeholder="Paste IDs such as NEL21-S08-Q001, separated by spaces, commas, or new lines"></textarea>
+          <div class="hint" id="exclHint"></div>
+        </div>
+      </details>
+    </div>
+  </section>
+</div>
+
+<!-- Side summary -->
+<aside class="side">
+  <section class="card">
+    <div class="bd" style="padding-top:18px">
+      <div style="font-size:12.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em">Exam summary</div>
+      <div class="row" style="align-items:baseline;margin:6px 0 10px"><span class="big-n" id="sumN">0</span><span style="color:var(--ink-2)">questions</span></div>
+      <div class="stat"><span>Sections covered</span><b id="sumSec">0</b></div>
+      <div class="stat"><span>Easy</span><b id="sumE">0</b></div>
+      <div class="stat"><span>Average</span><b id="sumA">0</b></div>
+      <div class="stat"><span>Difficult</span><b id="sumD">0</b></div>
+      <div class="stat"><span>Time allowed</span><b id="sumT">0 min</b></div>
+      <div id="sumAlerts"></div>
+      <button class="btn primary big" id="genBtn" style="margin-top:16px">Generate exam</button>
+      <div id="dlBox" style="display:none;margin-top:10px">
+        <button class="btn red big" id="dlExam">Download exam PDF</button>
+        <button class="btn big" id="dlKey" style="margin-top:8px">Download answer key + rationale PDF</button>
+      </div>
+    </div>
+  </section>
+</aside>
+</div>
+
+<!-- Preview -->
+<section class="card" id="preview">
+  <div class="pv-head">
+    <h2 id="pvTitle">Preview</h2>
+    <div class="grow"></div>
+    <label class="toggle"><input type="checkbox" id="showAns"> Show answers and rationale</label>
+    <button class="btn sm" id="copyIds">Copy question IDs</button>
+  </div>
+  <div class="blueprint"><table class="bp" id="bp"></table></div>
+  <ol class="qs" id="qlist"></ol>
+</section>
+</div>
+</main>
+
+<footer class="site">
+  <div class="wrap"><span>© Cristina May A. Manalaysay, MD (2026)</span><span>St. Luke's Medical Center · Department of Pediatrics</span></div>
+</footer>
+<div class="toast" id="toast"></div>
+<div class="busy" id="busy">Building PDF…</div>
+
+<script>/*__JSPDF__*/</script>
+<script>
+"use strict";
+const DATA = /*__DATA__*/null;
+const LOGO = "__LOGO__";
+const COPYRIGHT = "© Cristina May A. Manalaysay, MD (2026)";
+const DIFF = ["Easy", "Average", "Difficult"], DK = ["E", "A", "D"];
+const COG = ["Recall", "Application", "Clinical Reasoning"];
+const L = "ABCD";
+
+const Q = DATA.q.map(r => ({ id:r[0], sec:r[1], item:r[2], stem:r[3], opts:r[4], ans:r[5], rat:r[6], exp:r[7],
+  topic:r[8], diff:r[9], cog:r[10], k:r[11], fixed:r[12], status:r[13], refs:r[14] }));
+const SECS = DATA.sections;
+const SEC = Object.fromEntries(SECS.map(s => [s.no, s]));
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+
+/* ---------- Seeded random ---------- */
+function hashStr(str) { let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  return h1 >>> 0; }
+function rngFrom(seed) { let a = hashStr(seed);
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuffle(arr, rng) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+function newCode() { const ch = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; const d = new Date();
+  let s = ""; for (let i = 0; i < 4; i++) s += ch[Math.floor(Math.random() * ch.length)];
+  return `PED-${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, "0")}-${s}`; }
+
+/* ---------- State ---------- */
+const state = { mode: "even", sel: new Set(SECS.map(s => s.no)), custom: {}, mix: [30, 40, 30], exam: null };
+SECS.forEach(s => state.custom[s.no] = 0);
+
+function excludedIds() { return new Set(($("exclude").value.toUpperCase().match(/NEL\d+-S\d+-Q\d+/g)) || []); }
+function filters() {
+  return { cogs: new Set([...document.querySelectorAll("#cogChecks input:checked")].map(i => +i.value)),
+    k: $("incK").checked, status: $("status").value, excl: excludedIds() };
+}
+function eligible(q, f) {
+  if (!f.cogs.has(q.cog)) return false;
+  if (!f.k && q.k) return false;
+  if (f.status === "noRev" && /needs revision/i.test(q.status)) return false;
+  if (f.status === "approved" && !/^approved$/i.test(q.status)) return false;
+  return !f.excl.has(q.id);
+}
+// pools[sec][diff] = eligible questions
+function buildPools() { const f = filters(), pools = {};
+  SECS.forEach(s => pools[s.no] = [[], [], []]);
+  Q.forEach(q => { if (eligible(q, f)) pools[q.sec][q.diff].push(q); });
+  return pools; }
+
+/* Largest-remainder split of n across keys by weight, respecting caps. */
+function distribute(n, keys, weight, cap, rng) {
+  const alloc = Object.fromEntries(keys.map(k => [k, 0]));
+  let left = n, active = keys.filter(k => cap[k] > 0 && weight[k] > 0);
+  while (left > 0 && active.length) {
+    const tw = active.reduce((a, k) => a + weight[k], 0);
+    const shares = active.map(k => ({ k, x: left * weight[k] / tw }));
+    let given = 0;
+    shares.forEach(s => { const f = Math.min(Math.floor(s.x), cap[s.k] - alloc[s.k]); alloc[s.k] += f; given += f; s.r = s.x - Math.floor(s.x); });
+    left -= given;
+    shuffle(shares, rng).sort((a, b) => b.r - a.r);
+    for (const s of shares) { if (left <= 0) break; if (alloc[s.k] < cap[s.k]) { alloc[s.k]++; left--; } }
+    active = active.filter(k => alloc[k] < cap[k]);
+  }
+  return { alloc, short: left };
+}
+
+/* Plan: per-section counts and per-section × difficulty counts. */
+function plan(pools, seed) {
+  const rng = rngFrom(seed + "|plan");
+  const mix = state.mix, useD = [0, 1, 2].filter(d => mix[d] > 0);
+  const secs = SECS.map(s => s.no).filter(no => state.sel.has(no));
+  const cap = {}; secs.forEach(no => cap[no] = useD.reduce((a, d) => a + pools[no][d].length, 0));
+  let perSec, short = 0;
+  if (state.mode === "custom") {
+    perSec = {}; secs.forEach(no => { perSec[no] = Math.min(state.custom[no] || 0, cap[no]); short += (state.custom[no] || 0) - perSec[no]; });
+  } else {
+    const n = Math.max(0, +$("nq").value || 0);
+    const w = {}; secs.forEach(no => w[no] = state.mode === "prop" ? (pools[no][0].length + pools[no][1].length + pools[no][2].length) || 0 : 1);
+    const r = distribute(n, secs, w, cap, rng); perSec = r.alloc; short = r.short;
+  }
+  const total = secs.reduce((a, no) => a + perSec[no], 0);
+  // global difficulty targets
+  const dCap = [0, 1, 2].map(d => mix[d] > 0 ? secs.reduce((a, no) => a + pools[no][d].length, 0) : 0);
+  const tgt = distribute(total, [0, 1, 2], mix, dCap, rng).alloc;
+  const deficit = [tgt[0], tgt[1], tgt[2]];
+  const cell = {};
+  shuffle(secs.slice(), rng).sort((a, b) => cap[a] - perSec[a] - (cap[b] - perSec[b])).forEach(no => {
+    const x = [0, 0, 0], a = pools[no].map(p => p.length); let need = perSec[no];
+    useD.forEach(d => { const f = Math.min(Math.floor(perSec[no] * mix[d] / 100), a[d], deficit[d]); x[d] = f; need -= f; deficit[d] -= f; });
+    while (need > 0) {
+      const opts = useD.filter(d => x[d] < a[d]); if (!opts.length) break;
+      opts.sort((p, q) => (deficit[q] - deficit[p]) || ((a[q] - x[q]) - (a[p] - x[p])));
+      const d = opts[0]; x[d]++; deficit[d]--; need--;
+    }
+    cell[no] = x;
+  });
+  const dTot = [0, 1, 2].map(d => secs.reduce((s, no) => s + cell[no][d], 0));
+  return { secs, perSec, cell, total, short, tgt, dTot, cap };
+}
+
+/* ---------- UI: sections ---------- */
+function renderSections() {
+  const pools = buildPools(), p = plan(pools, $("code").value || "x");
+  const body = $("secBody"); const custom = state.mode === "custom";
+  let html = "", availTot = 0;
+  SECS.forEach(s => {
+    const on = state.sel.has(s.no), av = pools[s.no].map(x => x.length), tot = av[0] + av[1] + av[2];
+    if (on) availTot += tot;
+    const mini = `<span class="mini" title="Easy ${av[0]} · Average ${av[1]} · Difficult ${av[2]}">${av.map((v, d) => `<i style="height:${4 + Math.round(10 * v / Math.max(1, tot))}px;background:var(--${["e", "a", "d"][d]})"></i>`).join("")}</span>`;
+    const cnt = custom
+      ? `<input type="number" min="0" max="${tot}" value="${state.custom[s.no] || 0}" data-sec="${s.no}" ${on ? "" : "disabled"}>`
+      : `<span class="cnt">${on ? (p.perSec[s.no] || 0) : "–"}</span>`;
+    html += `<tr class="${on ? "" : "off"}"><td><input type="checkbox" data-chk="${s.no}" ${on ? "checked" : ""}></td><td class="no">${s.no}</td><td>${esc(s.title)}</td><td class="n">${tot}${mini}</td><td class="n">${cnt}</td></tr>`;
+  });
+  body.innerHTML = html;
+  $("secFootAvail").textContent = availTot.toLocaleString();
+  $("secFootN").textContent = p.total;
+  $("secSub").textContent = `${state.sel.size} of ${SECS.length} sections selected`;
+  $("distHint").textContent = custom
+    ? "Type how many items to draw from each section. The total sets the exam length."
+    : state.mode === "prop" ? "Items are split in proportion to each section's available questions."
+    : "Items are split as evenly as possible across the selected sections.";
+  return p;
+}
+
+function updateSummary() {
+  const p = renderSections();
+  const n = p.total;
+  if (state.mode === "custom") $("nq").value = n;
+  $("nq").disabled = state.mode === "custom";
+  $("sumN").textContent = n;
+  $("sumSec").textContent = p.secs.filter(no => p.perSec[no] > 0).length;
+  ["E", "A", "D"].forEach((k, d) => $("sum" + k).textContent = `${p.dTot[d]}  (${n ? Math.round(100 * p.dTot[d] / n) : 0}%)`);
+  $("sumT").textContent = `${minutes(n)} min`;
+  $("minutes").placeholder = `Auto (${n} min)`;
+  $("nqHint").textContent = state.mode === "custom" ? "Set by the custom section counts below." : "About 1 minute per item, as in the source exams.";
+  const al = [];
+  const tot = state.mix.reduce((a, b) => a + b, 0);
+  if (tot !== 100) al.push(["err", `Difficulty percentages add up to ${tot}%. They must total 100%.`]);
+  if (!state.sel.size) al.push(["err", "Select at least one section."]);
+  if (p.short > 0) al.push(["warn", `${p.short} item(s) could not be drawn because the selected sections don't have enough matching questions.`]);
+  const off = [0, 1, 2].filter(d => p.dTot[d] !== Math.round(n * state.mix[d] / 100) && Math.abs(p.dTot[d] - n * state.mix[d] / 100) >= 1);
+  if (n && tot === 100 && off.length) al.push(["warn", "The difficulty mix was adjusted slightly to fit the questions available in the selected sections."]);
+  $("sumAlerts").innerHTML = al.map(([c, t]) => `<div class="alert ${c}">${t}</div>`).join("");
+  $("genBtn").disabled = !n || tot !== 100;
+  const ex = excludedIds().size; $("exclHint").textContent = ex ? `${ex} question ID(s) will be excluded.` : "";
+  renderMix();
+}
+const minutes = n => +$("minutes").value || n;
+
+function renderMix() {
+  const [e, a, d] = state.mix, t = Math.max(1, e + a + d);
+  $("barE").style.width = 100 * e / t + "%"; $("barA").style.width = 100 * a / t + "%"; $("barD").style.width = 100 * d / t + "%";
+  const pools = buildPools(), av = [0, 1, 2].map(k => SECS.filter(s => state.sel.has(s.no)).reduce((x, s) => x + pools[s.no][k].length, 0));
+  $("mixLegend").innerHTML = DIFF.map((nm, k) => `<span><b style="background:var(--${["e", "a", "d"][k]})"></b>${nm} ${state.mix[k]}% · ${av[k].toLocaleString()} available</span>`).join("");
+}
+
+/* ---------- Generate ---------- */
+function generate() {
+  const code = ($("code").value || "").trim() || newCode(); $("code").value = code;
+  const pools = buildPools(), p = plan(pools, code);
+  const rng = rngFrom(code + "|pick");
+  let picked = [];
+  p.secs.forEach(no => [0, 1, 2].forEach(d => {
+    const pool = shuffle(pools[no][d].slice().sort((a, b) => a.item - b.item), rng);
+    picked.push(...pool.slice(0, p.cell[no][d]));
+  }));
+  if ($("order").value === "rand") shuffle(picked, rng);
+  else { const bySec = {}; picked.forEach(q => (bySec[q.sec] = bySec[q.sec] || []).push(q));
+    picked = Object.keys(bySec).sort((a, b) => a - b).flatMap(k => shuffle(bySec[k], rng)); }
+  const shuf = $("shufOpts").checked;
+  const items = picked.map(q => ({ q, perm: shuf && !q.fixed ? shuffle([0, 1, 2, 3], rng) : [0, 1, 2, 3] }));
+  state.exam = { code, items, title: $("title").value.trim() || "Pediatrics Written Examination",
+    date: $("examDate").value, minutes: minutes(items.length), instr: $("instr").value.trim(), paper: $("paper").value, sheet: $("ansSheet").checked };
+  renderPreview();
+  $("dlBox").style.display = "block";
+  $("preview").style.display = "block";
+  $("preview").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function itemView(it) { const q = it.q;
+  return { opts: it.perm.map(i => q.opts[i]), exp: it.perm.map(i => q.exp[i]), ans: it.perm.indexOf(q.ans) }; }
+
+function renderPreview() {
+  const ex = state.exam;
+  $("pvTitle").textContent = `${ex.title} · Set ${ex.code} · ${ex.items.length} items`;
+  // blueprint
+  const rows = {}; ex.items.forEach(({ q }) => { (rows[q.sec] = rows[q.sec] || [0, 0, 0])[q.diff]++; });
+  const tot = [0, 0, 0];
+  let h = `<thead><tr><th>Section</th><th>Easy</th><th>Average</th><th>Difficult</th><th>Total</th></tr></thead><tbody>`;
+  Object.keys(rows).sort((a, b) => a - b).forEach(no => { const r = rows[no]; r.forEach((v, d) => tot[d] += v);
+    h += `<tr><td>${no}. ${esc(SEC[no].title)}</td>${r.map(v => `<td>${v || "–"}</td>`).join("")}<td><b>${r[0] + r[1] + r[2]}</b></td></tr>`; });
+  h += `</tbody><tfoot><tr><td>Total</td>${tot.map(v => `<td>${v}</td>`).join("")}<td>${ex.items.length}</td></tr></tfoot>`;
+  $("bp").innerHTML = h;
+  $("qlist").innerHTML = ex.items.map((it, i) => {
+    const q = it.q, v = itemView(it);
+    const wrong = v.exp.map((e, j) => j !== v.ans && e ? `<div><b>${L[j]}.</b> ${esc(e)}</div>` : "").join("");
+    return `<li><div class="qn">${i + 1}.</div><div><div class="qstem">${esc(q.stem)}</div>
+      <ul class="qopts">${v.opts.map((o, j) => `<li class="${j === v.ans ? "correct" : ""}"><b>${L[j]}.</b>${esc(o)}</li>`).join("")}</ul></div>
+      <div class="qmeta"><span class="tag">Sec ${q.sec}</span><span class="tag">${esc(q.topic)}</span><span class="tag ${DK[q.diff]}">${DIFF[q.diff]}</span><span class="tag">${COG[q.cog]}</span><span>${q.id}</span>
+      <button class="btn sm" data-swap="${i}" title="Replace with another question from the same section and difficulty">Replace</button></div>
+      <div class="rat"><div><b>Answer: ${L[v.ans]}.</b> ${esc(q.rat)}</div>${wrong ? `<div style="margin-top:6px">${wrong}</div>` : ""}</div></li>`;
+  }).join("");
+}
+
+function swap(i) {
+  const ex = state.exam, cur = ex.items[i].q, used = new Set(ex.items.map(x => x.q.id));
+  const pools = buildPools();
+  let cand = pools[cur.sec][cur.diff].filter(q => !used.has(q.id));
+  if (!cand.length) cand = pools[cur.sec].flat().filter(q => !used.has(q.id));
+  if (!cand.length) return toast("No other matching question is available in this section.");
+  const q = cand[Math.floor(Math.random() * cand.length)];
+  ex.items[i] = { q, perm: $("shufOpts").checked && !q.fixed ? shuffle([0, 1, 2, 3], Math.random) : [0, 1, 2, 3] };
+  renderPreview(); toast(`Question ${i + 1} replaced (${q.id}).`);
+}
+
+/* ---------- PDF ---------- */
+const PDFMAP = { "“":'"', "”":'"', "„":'"', "‘":"'", "’":"'", "′":"'", "″":'"', "–":"-", "—":" - ", "−":"-", "‐":"-", "‑":"-",
+  "…":"...", "•":"-", "≥":">=", "≤":"<=", "→":"->", "←":"<-", "↑":"(up)", "↓":"(down)", "≈":"~", "≠":"!=", " ":" ", " ":" ", " ":" ",
+  "α":"alpha", "β":"beta", "γ":"gamma", "δ":"delta", "ε":"epsilon", "κ":"kappa", "λ":"lambda", "ω":"omega", "Δ":"Delta", "μ":"µ",
+  "⁰":"^0", "¹":"^1", "⁴":"^4", "⁵":"^5", "⁶":"^6", "⁷":"^7", "⁸":"^8", "⁹":"^9", "⁻":"^-", "₂":"2", "₃":"3", "✓":"", "✔":"" };
+function T(s) { return String(s ?? "").replace(/[^\x00-\xFF]/g, c => PDFMAP[c] ?? (c.normalize("NFKD").replace(/[^\x00-\xFF]/g, "") || "?")).replace(/\^(\d)\^(\d)/g, "^$1$2"); }
+function hex(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+const C = { blue: "#22408f", red: "#d4262e", ink: "#16203a", ink2: "#4a5672", ink3: "#7c869d", line: "#cfd6e4", ok: "#1d7a46", okSoft: "#e5f4ec", soft: "#f3f6fb" };
+const LOGO_AR = 88 / 256;
+
+function makeDoc(ex, kind) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: ex.paper, compress: true });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = { l: 18, r: 18, t: 28, b: 20 }, CW = W - M.l - M.r;
+  const ctx = { doc, W, H, M, CW, y: M.t, kind, ex };
+  ctx.color = c => doc.setTextColor(...hex(c));
+  ctx.font = (size, style = "normal", color = C.ink) => { doc.setFont("helvetica", style); doc.setFontSize(size); ctx.color(color); };
+  ctx.lh = (size, f = 1.32) => size * 0.3528 * f;
+  ctx.runningHeader = () => {
+    const lw = 24; doc.addImage(LOGO, "PNG", M.l, 8.5, lw, lw * LOGO_AR);
+    ctx.font(7.5, "bold", C.blue); doc.text("DEPARTMENT OF PEDIATRICS", W - M.r, 11, { align: "right" });
+    ctx.font(7.5, "normal", C.ink2); doc.text(T(ex.title) + (kind === "key" ? "  |  Answer Key" : ""), W - M.r, 14.6, { align: "right" });
+    doc.text(`Set ${ex.code}`, W - M.r, 18.2, { align: "right" });
+    doc.setDrawColor(...hex(C.red)); doc.setLineWidth(0.5); doc.line(M.l, 20.5, W - M.r, 20.5);
+  };
+  ctx.newPage = () => { doc.addPage(); ctx.runningHeader(); ctx.y = M.t; };
+  ctx.room = h => { if (ctx.y + h > H - M.b) ctx.newPage(); };
+  // Flowing paragraph; label (e.g. "12.") hangs at x, text starts at x+indent.
+  ctx.para = (text, o = {}) => {
+    const size = o.size || 10, x = (o.x ?? M.l), ind = o.indent || 0, w = (o.w ?? (M.l + CW - x)) - ind;
+    ctx.font(size, o.style || "normal", o.color || C.ink);
+    const lines = doc.splitTextToSize(T(text), w), lh = ctx.lh(size, o.lf);
+    lines.forEach((ln, i) => {
+      if (ctx.y + lh > H - M.b) ctx.newPage();
+      if (o.bg) { doc.setFillColor(...hex(o.bg)); doc.rect(x - 1.5, ctx.y - 0.9, w + ind + 3, lh + (i === lines.length - 1 ? 0.6 : 0), "F"); }
+      if (i === 0 && o.label) { ctx.font(size, o.labelStyle || "bold", o.labelColor || o.color || C.ink); doc.text(T(o.label), x, ctx.y, { baseline: "top" }); ctx.font(size, o.style || "normal", o.color || C.ink); }
+      doc.text(ln, x + ind, ctx.y, { baseline: "top" });
+      ctx.y += lh;
+    });
+    return lines.length * lh;
+  };
+  ctx.measure = (text, size, w, style = "normal") => { doc.setFont("helvetica", style); doc.setFontSize(size); return doc.splitTextToSize(T(text), w).length * ctx.lh(size); };
+  return ctx;
+}
+
+function titleBlock(ctx, subtitle, subColor) {
+  const { doc, W, M, ex } = ctx;
+  const lw = 56; doc.addImage(LOGO, "PNG", (W - lw) / 2, 12, lw, lw * LOGO_AR);
+  let y = 12 + lw * LOGO_AR + 6;
+  ctx.font(10, "bold", C.red); doc.text("DEPARTMENT OF PEDIATRICS", W / 2, y, { align: "center", charSpace: 0.4 }); y += 7.5;
+  ctx.font(16, "bold", C.blue); doc.splitTextToSize(T(ex.title), ctx.CW).forEach(l => { doc.text(l, W / 2, y, { align: "center" }); y += 6.8; });
+  if (subtitle) { ctx.font(11.5, "bold", subColor || C.ink); doc.text(subtitle, W / 2, y, { align: "center" }); y += 6; }
+  const dt = ex.date ? new Date(ex.date + "T00:00").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : null;
+  ctx.font(9, "normal", C.ink2);
+  doc.text([`${ex.items.length} items`, `${ex.minutes} minutes`, `Set ${ex.code}`, dt].filter(Boolean).join("   |   "), W / 2, y, { align: "center" }); y += 4;
+  doc.setDrawColor(...hex(C.red)); doc.setLineWidth(0.6); doc.line(M.l, y, W - M.r, y);
+  ctx.y = y + 6;
+}
+
+function footers(ctx, label) {
+  const { doc, W, H, M } = ctx, n = doc.getNumberOfPages();
+  for (let i = 1; i <= n; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(...hex(C.line)); doc.setLineWidth(0.3); doc.line(M.l, H - 13.5, W - M.r, H - 13.5);
+    ctx.font(8, "normal", C.ink3);
+    doc.text(COPYRIGHT, M.l, H - 9);
+    doc.text(T(`${label}  |  Set ${ctx.ex.code}  |  Page ${i} of ${n}`), W - M.r, H - 9, { align: "right" });
+  }
+}
+
+function buildExamPdf(ex) {
+  const ctx = makeDoc(ex, "exam"), { doc, M, CW } = ctx;
+  titleBlock(ctx);
+  // Examinee fields
+  const fy = ctx.y, fh = 8; doc.setDrawColor(...hex(C.line)); doc.setLineWidth(0.3);
+  const fields = [["Name", 0, 0.62], ["Date", 0.62, 0.38], ["Level / Program", 0, 0.62], ["Score", 0.62, 0.38]];
+  fields.forEach(([lab, fx, fw], i) => { const x = M.l + CW * fx, y = fy + Math.floor(i / 2) * (fh + 3);
+    ctx.font(8, "bold", C.ink2); doc.text(lab.toUpperCase(), x, y + 5.2);
+    const lx = x + doc.getTextWidth(lab.toUpperCase()) + 2.5; doc.line(lx, y + 5.8, x + CW * fw - 4, y + 5.8);
+    if (lab === "Score") { ctx.font(9, "normal", C.ink2); doc.text(`/ ${ex.items.length}`, x + CW * fw - 4, y + 5.2, { align: "right" }); } });
+  ctx.y = fy + 2 * (fh + 3) + 2;
+  if (ex.instr) {
+    const h = ctx.measure(ex.instr, 9.5, CW - 8) + 9;
+    doc.setFillColor(...hex(C.soft)); doc.roundedRect(M.l, ctx.y, CW, h, 2, 2, "F");
+    ctx.font(8, "bold", C.blue); doc.text("INSTRUCTIONS", M.l + 4, ctx.y + 4.8);
+    ctx.y += 7; ctx.para(ex.instr, { x: M.l + 4, w: CW - 8, size: 9.5, color: C.ink });
+    ctx.y += 6;
+  }
+  let lastSec = null; const grouped = $("order").value === "sec";
+  ex.items.forEach((it, i) => {
+    const q = it.q, v = itemView(it), size = 10, ind = 8, oind = 6.5;
+    if (grouped && q.sec !== lastSec) {
+      ctx.room(22); lastSec = q.sec; ctx.y += 1;
+      ctx.font(9, "bold", C.blue); doc.text(T(`SECTION ${q.sec}  -  ${SEC[q.sec].title.toUpperCase()}`), M.l, ctx.y, { baseline: "top" });
+      doc.setDrawColor(...hex(C.blue)); doc.setLineWidth(0.25); doc.line(M.l, ctx.y + 4.6, M.l + CW, ctx.y + 4.6); ctx.y += 8;
+    }
+    let h = ctx.measure(q.stem, size, CW - ind) + 1.5;
+    v.opts.forEach(o => h += ctx.measure(o, size, CW - ind - oind) + 0.6);
+    ctx.room(Math.min(h, ctx.H - M.b - M.t));
+    ctx.para(q.stem, { label: `${i + 1}.`, indent: ind, size, labelColor: C.blue });
+    ctx.y += 1.5;
+    v.opts.forEach((o, j) => { ctx.para(o, { x: M.l + ind, indent: oind, size, label: `${L[j]}.`, labelStyle: "bold", labelColor: C.ink2 }); ctx.y += 0.6; });
+    ctx.y += 4;
+  });
+  if (ex.sheet) answerSheet(ctx);
+  footers(ctx, "Examination");
+  return doc;
+}
+
+function answerSheet(ctx) {
+  const { doc, M, CW, H, ex } = ctx; ctx.newPage();
+  ctx.font(13, "bold", C.blue); doc.text("ANSWER SHEET", M.l, ctx.y, { baseline: "top" });
+  ctx.font(8.5, "normal", C.ink2); doc.text("Shade the circle of your chosen answer completely. Mark only one answer per item.", M.l, ctx.y + 6.5, { baseline: "top" });
+  ctx.y += 12; doc.setDrawColor(...hex(C.line)); doc.setLineWidth(0.3);
+  [["Name", 0.62], ["Date", 0.38]].reduce((x, [lab, fw]) => { ctx.font(8, "bold", C.ink2); doc.text(lab.toUpperCase(), x, ctx.y + 4); doc.line(x + doc.getTextWidth(lab.toUpperCase()) + 2.5, ctx.y + 4.6, x + CW * fw - 4, ctx.y + 4.6); return x + CW * fw; }, M.l);
+  ctx.y += 11;
+  const cols = 4, colW = CW / cols, rowH = 6.4, top0 = ctx.y;
+  const rowsFit = p => Math.floor((H - M.b - 2 - (p ? M.t : top0)) / rowH);
+  let i = 0, page = 0;
+  while (i < ex.items.length) {
+    const top = page ? M.t : top0, rows = Math.min(rowsFit(page), Math.ceil((ex.items.length - i) / cols));
+    for (let c = 0; c < cols && i < ex.items.length; c++) for (let r = 0; r < rows && i < ex.items.length; r++, i++) {
+      const x = M.l + c * colW, y = top + r * rowH;
+      ctx.font(9, "bold", C.ink); doc.text(String(i + 1) + ".", x + 9, y + 3.2, { align: "right" });
+      for (let k = 0; k < 4; k++) { const cx = x + 14 + k * 7.2; doc.setDrawColor(...hex(C.ink3)); doc.circle(cx, y + 2.1, 2.3);
+        ctx.font(6.5, "normal", C.ink3); doc.text(L[k], cx, y + 3.2, { align: "center" }); }
+    }
+    if (i < ex.items.length) { ctx.newPage(); page++; }
+  }
+}
+
+function buildKeyPdf(ex) {
+  const ctx = makeDoc(ex, "key"), { doc, M, CW, H } = ctx;
+  titleBlock(ctx, "ANSWER KEY & RATIONALE", C.red);
+  ctx.font(8.5, "bold", C.red); doc.text("CONFIDENTIAL  -  FOR FACULTY USE ONLY", ctx.W / 2, ctx.y - 1.5, { align: "center" }); ctx.y += 4;
+
+  // Blueprint table
+  ctx.font(10.5, "bold", C.blue); doc.text("Exam blueprint", M.l, ctx.y, { baseline: "top" }); ctx.y += 6.5;
+  const rows = {}; ex.items.forEach(({ q }) => (rows[q.sec] = rows[q.sec] || [0, 0, 0])[q.diff]++);
+  const cw = [CW - 4 * 18, 18, 18, 18, 18], rh = 5.6;
+  const drawRow = (cells, style, fill) => { ctx.room(rh);
+    if (fill) { doc.setFillColor(...hex(fill)); doc.rect(M.l, ctx.y, CW, rh, "F"); }
+    ctx.font(8.5, style, C.ink); let x = M.l;
+    cells.forEach((c, j) => { if (j === 0) doc.text(T(c), x + 2, ctx.y + 3.9); else doc.text(String(c), x + cw[j] - 2, ctx.y + 3.9, { align: "right" }); x += cw[j]; });
+    doc.setDrawColor(...hex(C.line)); doc.setLineWidth(0.2); doc.line(M.l, ctx.y + rh, M.l + CW, ctx.y + rh); ctx.y += rh; };
+  drawRow(["Section", "Easy", "Average", "Difficult", "Total"], "bold", C.soft);
+  const tot = [0, 0, 0];
+  Object.keys(rows).sort((a, b) => a - b).forEach(no => { const r = rows[no]; r.forEach((v, d) => tot[d] += v);
+    let name = `${no}. ${SEC[no].title}`; ctx.font(8.5); while (doc.getTextWidth(name) > cw[0] - 4) name = name.slice(0, -2);
+    drawRow([name, ...r.map(v => v || "-"), r[0] + r[1] + r[2]], "normal"); });
+  drawRow(["Total", ...tot, ex.items.length], "bold", C.soft);
+  ctx.y += 8;
+
+  // Quick key grid
+  ctx.room(20); ctx.font(10.5, "bold", C.blue); doc.text("Answer key", M.l, ctx.y, { baseline: "top" }); ctx.y += 7;
+  const cols = 8, gw = CW / cols, gh = 5.6;
+  let i = 0;
+  while (i < ex.items.length) {
+    let rowsFit = Math.floor((H - M.b - ctx.y) / gh);
+    if (rowsFit < 2) { ctx.newPage(); rowsFit = Math.floor((H - M.b - ctx.y) / gh); }
+    const rowsHere = Math.min(rowsFit, Math.ceil((ex.items.length - i) / cols)), top = ctx.y;
+    for (let c = 0; c < cols; c++) for (let r = 0; r < rowsHere && i < ex.items.length; r++, i++) {
+      const x = M.l + c * gw, y = top + r * gh, v = itemView(ex.items[i]);
+      if (r % 2 === 0) { doc.setFillColor(...hex(C.soft)); doc.rect(x + 0.5, y, gw - 1, gh, "F"); }
+      ctx.font(8.5, "normal", C.ink2); doc.text(`${i + 1}.`, x + 9, y + 3.9, { align: "right" });
+      ctx.font(9, "bold", C.ok); doc.text(L[v.ans], x + 12, y + 3.9);
+    }
+    ctx.y = top + rowsHere * gh + 2;
+  }
+
+  // Rationales
+  ctx.newPage();
+  ctx.font(13, "bold", C.blue); doc.text("Rationale", M.l, ctx.y, { baseline: "top" }); ctx.y += 9;
+  ex.items.forEach((it, n) => {
+    const q = it.q, v = itemView(it), size = 9.5, ind = 8, oind = 6.5, X = M.l + ind;
+    ctx.room(ctx.measure(q.stem, size, CW - ind) + 4 * ctx.lh(size) + 4);
+    ctx.para(q.stem, { label: `${n + 1}.`, indent: ind, size, labelColor: C.blue });
+    ctx.y += 1.2;
+    v.opts.forEach((o, j) => { const ok = j === v.ans;
+      ctx.para(ok ? `${o}   (correct)` : o, { x: X, indent: oind, size, label: `${L[j]}.`, style: ok ? "bold" : "normal", color: ok ? C.ok : C.ink2, labelColor: ok ? C.ok : C.ink2, bg: ok ? C.okSoft : null });
+      ctx.y += 0.5; });
+    ctx.y += 2;
+    ctx.room(ctx.lh(size) * 2.5);
+    ctx.para(`Answer: ${L[v.ans]}`, { x: X, size, style: "bold", color: C.ok });
+    ctx.y += 0.8;
+    if (q.rat) { ctx.para(q.rat, { x: X, size }); ctx.y += 1.5; }
+    const wrong = v.exp.map((e, j) => [j, e]).filter(([j, e]) => j !== v.ans && e);
+    if (wrong.length) {
+      ctx.room(ctx.lh(8.5) * 3); ctx.para("Why the other choices are incorrect", { x: X, size: 8.5, style: "bold", color: C.blue }); ctx.y += 0.5;
+      wrong.forEach(([j, e]) => { ctx.para(e, { x: X, indent: 5.5, size: 9, label: `${L[j]}.`, color: C.ink2, labelColor: C.ink2 }); ctx.y += 0.4; });
+      ctx.y += 1.2;
+    }
+    const refs = q.refs.map(r => DATA.cites[r]).filter(Boolean);
+    if (refs.length) { ctx.para(refs.join("  "), { x: X, size: 7.8, style: "italic", color: C.ink3, label: "Reference:", indent: 15, labelStyle: "bolditalic", labelColor: C.ink3 }); ctx.y += 0.5; }
+    ctx.para(`Section ${q.sec}: ${SEC[q.sec].title}  |  ${q.topic}  |  ${DIFF[q.diff]}  |  ${COG[q.cog]}  |  ${q.id}`, { x: X, size: 7.8, color: C.ink3 });
+    ctx.y += 2.5;
+    if (n < ex.items.length - 1) { ctx.room(4); doc.setDrawColor(...hex(C.line)); doc.setLineWidth(0.2); doc.line(M.l, ctx.y, M.l + CW, ctx.y); ctx.y += 4; }
+  });
+  footers(ctx, "Answer Key & Rationale");
+  return doc;
+}
+
+function slug(s) { return s.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 50); }
+function download(kind) {
+  const ex = state.exam; if (!ex) return;
+  $("busy").classList.add("on");
+  setTimeout(() => {
+    try {
+      const doc = kind === "exam" ? buildExamPdf(ex) : buildKeyPdf(ex);
+      doc.save(`SLMC_PED_${slug(ex.title)}_${ex.code}_${kind === "exam" ? "Exam" : "AnswerKey"}.pdf`);
+    } catch (e) { console.error(e); toast("Could not build the PDF: " + e.message); }
+    $("busy").classList.remove("on");
+  }, 30);
+}
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2600); }
+
+/* ---------- Wire up ---------- */
+$("bankline").textContent = `Nelson Textbook of Pediatrics, 21st ed. question bank · ${Q.length.toLocaleString()} questions · ${SECS.length} sections`;
+$("code").value = newCode();
+$("examDate").value = new Date().toISOString().slice(0, 10);
+$("nqChips").innerHTML = [25, 50, 75, 100, 150, 200].map(n => `<button class="chip" data-n="${n}">${n}</button>`).join("");
+const markChips = () => document.querySelectorAll("#nqChips .chip").forEach(c => c.classList.toggle("on", +c.dataset.n === +$("nq").value));
+$("nqChips").addEventListener("click", e => { const n = e.target.dataset.n; if (!n || state.mode === "custom") return; $("nq").value = n; markChips(); updateSummary(); });
+$("nq").addEventListener("input", () => { markChips(); updateSummary(); });
+$("newCode").onclick = () => { $("code").value = newCode(); updateSummary(); };
+$("code").addEventListener("input", updateSummary);
+$("minutes").addEventListener("input", updateSummary);
+
+$("distMode").addEventListener("click", e => { const v = e.target.dataset.v; if (!v) return;
+  if (v === "custom" && state.mode !== "custom") { const p = plan(buildPools(), $("code").value || "x"); SECS.forEach(s => state.custom[s.no] = p.perSec[s.no] || 0); }
+  state.mode = v; document.querySelectorAll("#distMode button").forEach(b => b.classList.toggle("on", b === e.target)); updateSummary(); });
+$("secBody").addEventListener("change", e => {
+  const c = e.target.dataset.chk; if (c) { e.target.checked ? state.sel.add(+c) : state.sel.delete(+c); updateSummary(); } });
+$("secBody").addEventListener("input", e => { const s = e.target.dataset.sec; if (!s) return;
+  state.custom[s] = Math.max(0, Math.min(+e.target.max, Math.floor(+e.target.value || 0)));
+  const p = plan(buildPools(), $("code").value || "x"); // refresh totals without re-rendering the input being typed in
+  $("secFootN").textContent = p.total; $("nq").value = p.total; $("sumN").textContent = p.total;
+  clearTimeout(state._t); state._t = setTimeout(updateSummary, 700); });
+$("selAll").onclick = () => { SECS.forEach(s => state.sel.add(s.no)); updateSummary(); };
+$("selNone").onclick = () => { state.sel.clear(); updateSummary(); };
+
+const setMix = (m, preset) => { state.mix = m; ["pE", "pA", "pD"].forEach((id, d) => $(id).value = m[d]);
+  document.querySelectorAll("#diffPreset button").forEach(b => b.classList.toggle("on", b.dataset.v === (preset || m.join(",")))); updateSummary(); };
+$("diffPreset").addEventListener("click", e => { const v = e.target.dataset.v; if (!v) return;
+  if (v === "custom") { document.querySelectorAll("#diffPreset button").forEach(b => b.classList.toggle("on", b === e.target)); $("pE").focus(); return; }
+  setMix(v.split(",").map(Number)); });
+["pE", "pA", "pD"].forEach(id => $(id).addEventListener("input", () => {
+  const m = ["pE", "pA", "pD"].map(i => Math.max(0, +$(i).value || 0)); state.mix = m;
+  const match = [...document.querySelectorAll("#diffPreset button")].find(b => b.dataset.v === m.join(","));
+  document.querySelectorAll("#diffPreset button").forEach(b => b.classList.toggle("on", match ? b === match : b.dataset.v === "custom"));
+  updateSummary(); }));
+document.querySelectorAll("#cogChecks input, #incK, #status").forEach(el => el.addEventListener("change", updateSummary));
+$("exclude").addEventListener("input", () => { clearTimeout(state._e); state._e = setTimeout(updateSummary, 300); });
+
+$("genBtn").onclick = generate;
+$("dlExam").onclick = () => download("exam");
+$("dlKey").onclick = () => download("key");
+$("showAns").onchange = e => $("qlist").classList.toggle("show-ans", e.target.checked);
+$("qlist").addEventListener("click", e => { const i = e.target.dataset.swap; if (i !== undefined) swap(+i); });
+$("copyIds").onclick = () => { const ids = state.exam.items.map(x => x.q.id).join("\n");
+  (navigator.clipboard ? navigator.clipboard.writeText(ids) : Promise.reject()).then(() => toast(`${state.exam.items.length} question IDs copied.`), () => { $("exclude").value += ids; toast("IDs added to the exclude box."); }); };
+markChips(); updateSummary();
+</script>
+</body>
+</html>
